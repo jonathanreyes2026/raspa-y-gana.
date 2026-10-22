@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RASPA Y GANA</title>
+<style>
+body{margin:0;background:#031f19;color:#f5d46b;font-family:Arial;text-align:center;padding:20px}
+.app{max-width:450px;margin:auto;background:#0c382e;padding:22px;border-radius:25px}
+h1{font-size:34px}
+.panel{background:#f8e9bf;color:#67451e;padding:22px;border-radius:22px}
+canvas{width:100%;height:120px;touch-action:none;display:block;border-radius:10px}
+.prize{font-size:27px;font-weight:bold;margin:10px}
+button{width:100%;padding:17px;background:#f2c447;border:0;border-radius:14px;font-size:19px;font-weight:bold;margin-top:16px}
+.note{color:#e1eee7;font-size:14px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="app">
+<h1>🍀 RASPA Y GANA</h1>
+<p>¡Tu suerte puede estar aquí!</p>
+<div class="panel">
+<h2>TU RASPABLE</h2>
+<div class="prize" id="prize">Pulsa el botón para empezar</div>
+<canvas id="scratch"></canvas>
+<p>Desliza el dedo para raspar</p>
+</div>
+<h1>$1.00 por raspable</h1>
+<p>Premio ilustrativo: $25</p>
+<button id="start">PROBAR RASPABLE</button>
+<p id="status" class="note">Demostración gratuita. No se realizan pagos ni se entregan premios reales.</p>
+<p class="note">Consulta las reglas y condiciones antes de participar.</p>
+</div>
+<script>
+const c=document.getElementById('scratch');
+const x=c.getContext('2d');
+const prize=document.getElementById('prize');
+let ready=false,down=false;
+function cover(){
+ const r=c.getBoundingClientRect();
+ c.width=r.width*devicePixelRatio;
+ c.height=120*devicePixelRatio;
+ x.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+ x.globalCompositeOperation='source-over';
+ const g=x.createLinearGradient(0,0,r.width,120);
+ g.addColorStop(0,'#d8d8d8');g.addColorStop(1,'#999999');
+ x.fillStyle=g;x.fillRect(0,0,r.width,120);
+ x.fillStyle='#555';x.font='bold 20px Arial';x.textAlign='center';
+ x.fillText('RASPA AQUÍ',r.width/2,67);
+ x.globalCompositeOperation='destination-out';
+}
+function scratch(e){
+ if(!ready||!down)return;
+ const r=c.getBoundingClientRect();
+ x.beginPath();
+ x.arc(e.clientX-r.left,e.clientY-r.top,20,0,Math.PI*2);
+ x.fill();
+}
+c.addEventListener('pointerdown',e=>{if(!ready)return;down=true;c.setPointerCapture(e.pointerId);scratch(e)});
+c.addEventListener('pointermove',scratch);
+c.addEventListener('pointerup',()=>down=false);
+c.addEventListener('pointercancel',()=>down=false);
+document.getElementById('start').onclick=()=>{
+ ready=true;
+ prize.textContent='Resultado ficticio: prueba completada';
+ document.getElementById('status').textContent='Resultado de demostración sin valor monetario.';
+ cover();
+};
+window.addEventListener('resize',()=>{if(ready)cover()});
+cover();
+</script>
+</body>
+</html>
